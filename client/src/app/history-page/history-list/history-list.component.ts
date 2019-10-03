@@ -1,0 +1,48 @@
+import {AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild} from '@angular/core';
+import {Order} from "../../shared/interfaces";
+import {MaterialInstance, MaterialService} from "../../shared/classes/material.service";
+
+
+@Component({
+  selector: 'app-history-list',
+  templateUrl: './history-list.component.html',
+  styleUrls: ['./history-list.component.css']
+})
+export class HistoryListComponent implements OnDestroy, AfterViewInit{
+
+
+  @Input() orders: Order[];
+  // @ts-ignore
+  @ViewChild('modal') modalRef: ElementRef;
+  selectedOrder: Order;
+  selectName:string;
+  selectAddress:string;
+  selectPhone:string;
+  selectCommit:string;
+  modal: MaterialInstance;
+  ngOnDestroy() {
+    this.modal.destroy()
+  }
+  ngAfterViewInit(): void {
+    this.modal = MaterialService.initModal(this.modalRef)
+  }
+
+  computePrice(order: Order): number {
+    return order.list.reduce((total, item) => {
+      return total += item.quantity * item.cost
+    }, 0)
+  }
+
+  selectOrder(order: Order) {
+    this.selectedOrder = order;
+    this.modal.open();
+    this.selectName = order.NameClient;
+    this.selectAddress = order.AddressClient;
+    this.selectPhone = order.PhoneClient;
+    this.selectCommit = order.CommitClient;
+  }
+
+  closeModal() {
+    this.modal.close()
+  }
+}
